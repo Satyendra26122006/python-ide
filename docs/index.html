@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,7 +6,7 @@
     <title>Python IDE in Browser</title>
     <meta
       name="description"
-      content="A simple browser-based Python editor that runs code using Pyodide."
+      content="A browser-based Python IDE with code execution, package manager, file workspace, search, CSV preview, and command runner."
     />
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -14,34 +14,90 @@
     <main class="app-shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">Shareable browser demo</p>
+          <p class="eyebrow">Shareable browser IDE</p>
           <h1>Python IDE in your browser</h1>
           <p class="subtitle">
-            Write Python, run it instantly, and share this link with anyone.
+            Edit files, run Python, install packages, inspect CSV data, search project files, and manage your workspace.
           </p>
         </div>
         <div class="hero-actions">
-          <button id="runButton">Run code</button>
-          <button id="exampleButton" class="secondary">Load example</button>
-          <button id="clearButton" class="secondary">Clear</button>
+          <button id="runButton">Run current file</button>
+          <button id="saveButton" class="secondary">Save file</button>
+          <button id="newFileButton" class="secondary">New file</button>
+          <button id="downloadButton" class="secondary">Download file</button>
         </div>
       </header>
 
       <section class="workspace">
-        <label for="codeEditor">Python editor</label>
-        <textarea id="codeEditor" spellcheck="false">
-print("Hello from your browser!")
-name = input("What is your name? ")
-print(f"Nice to meet you, {name}!")
-        </textarea>
-
-        <div class="output-panel">
-          <div class="output-header">
-            <strong>Output</strong>
-            <span id="status">Loading Python runtime...</span>
+        <aside class="sidebar">
+          <div class="panel">
+            <div class="panel-title">Project Explorer</div>
+            <ul id="fileList" class="file-list"></ul>
+            <div class="sidebar-actions">
+              <button id="loadFilesButton">Load local file</button>
+              <input type="file" id="fileLoader" accept=".py,.txt,.md,.csv" hidden multiple />
+            </div>
           </div>
-          <pre id="output"></pre>
-        </div>
+
+          <div class="panel">
+            <div class="panel-title">Package Manager</div>
+            <input id="packageInput" placeholder="Package name (pyodide/pip)" />
+            <button id="installPackageButton">Install</button>
+            <button id="refreshEnvironmentButton" class="secondary">Refresh env</button>
+            <pre id="packageOutput" class="panel-output">Ready to install packages.</pre>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">Search</div>
+            <input id="searchInput" placeholder="Search project..." />
+            <button id="searchButton">Search</button>
+            <ul id="searchResults" class="search-results"></ul>
+          </div>
+        </aside>
+
+        <section class="editor-area">
+          <div class="editor-header">
+            <div>
+              <span id="currentFileLabel">main.py</span>
+              <span id="runtimeStatus" class="status">Loading runtime...</span>
+            </div>
+            <div class="editor-actions">
+              <button id="loadExampleButton" class="secondary">Load example</button>
+              <button id="clearOutputButton" class="secondary">Clear output</button>
+            </div>
+          </div>
+
+          <textarea id="codeEditor" spellcheck="false"></textarea>
+
+          <div class="output-panel">
+            <div class="output-header">
+              <strong>Output</strong>
+              <span id="outputStatus">Ready</span>
+            </div>
+            <pre id="output"></pre>
+          </div>
+        </section>
+
+        <aside class="right-panel">
+          <div class="panel">
+            <div class="panel-title">CSV Preview</div>
+            <button id="loadCsvButton">Load CSV file</button>
+            <input type="file" id="csvLoader" accept=".csv" hidden />
+            <pre id="csvPreview" class="panel-output">No CSV loaded.</pre>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">Command Runner</div>
+            <input id="terminalInput" placeholder="Python snippet or expression" />
+            <button id="terminalRunButton">Run command</button>
+            <pre id="terminalOutput" class="panel-output">Enter a command and press Run.</pre>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">Environment</div>
+            <pre id="envOutput" class="panel-output">Environment info will appear here.</pre>
+          </div>
+        </aside>
       </section>
     </main>
 
