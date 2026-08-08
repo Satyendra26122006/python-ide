@@ -1,14 +1,14 @@
 ﻿:root {
   color-scheme: dark;
-  --bg: #0f172a;
-  --panel: #111827;
-  --panel-2: #1f2937;
-  --panel-3: #111b2b;
-  --accent: #3b82f6;
-  --accent-2: #60a5fa;
-  --text: #f8fafc;
+  --bg: #090b13;
+  --panel: rgba(16, 24, 40, 0.95);
+  --panel-2: rgba(15, 23, 42, 0.95);
+  --panel-3: rgba(10, 15, 30, 0.95);
+  --accent: #7c3aed;
+  --accent-2: #8b5cf6;
+  --text: #e2e8f0;
   --muted: #94a3b8;
-  --border: #334155;
+  --border: rgba(148, 163, 184, 0.18);
 }
 
 * {
@@ -19,15 +19,16 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.16), transparent 24%),
-    linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.14), transparent 18%),
+    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.12), transparent 20%),
+    linear-gradient(180deg, #020617 0%, #090b13 100%);
   color: var(--text);
 }
 
 .app-shell {
-  max-width: 1600px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 20px;
 }
 
 .hero {
@@ -35,7 +36,7 @@ body {
   justify-content: space-between;
   gap: 16px;
   align-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
   flex-wrap: wrap;
 }
 
@@ -43,19 +44,19 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.25em;
   color: var(--accent-2);
-  font-size: 0.78rem;
-  margin: 0 0 8px;
+  font-size: 0.75rem;
+  margin: 0 0 6px;
 }
 
 h1 {
-  margin: 0 0 8px;
-  font-size: clamp(2rem, 2.5vw, 3rem);
+  margin: 0;
+  font-size: clamp(1.8rem, 2.4vw, 2.6rem);
 }
 
 .subtitle {
-  margin: 0;
+  margin: 8px 0 0;
   color: var(--muted);
-  max-width: 720px;
+  max-width: 600px;
 }
 
 .hero-actions {
@@ -72,47 +73,50 @@ textarea {
 
 button {
   border: none;
-  border-radius: 10px;
-  padding: 12px 16px;
+  border-radius: 12px;
+  padding: 10px 14px;
   font-weight: 600;
   cursor: pointer;
   background: var(--accent);
   color: white;
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  transition: transform 0.12s ease, background-color 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.14);
 }
 
 button:hover {
   transform: translateY(-1px);
+  box-shadow: 0 20px 45px rgba(124, 58, 237, 0.2);
 }
 
 button.secondary {
-  background: var(--panel-2);
+  background: rgba(100, 116, 139, 0.18);
   color: var(--text);
 }
 
 .workspace {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 360px;
-  gap: 18px;
+  grid-template-columns: 240px minmax(0, 1fr) 300px;
+  gap: 16px;
 }
 
 .sidebar,
 .right-panel {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .panel {
-  background: rgba(15, 23, 42, 0.92);
+  background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
 }
 
 .panel-title {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .file-list,
@@ -120,24 +124,25 @@ button.secondary {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 240px;
+  max-height: 220px;
   overflow: auto;
 }
 
 .file-list li,
 .search-results li {
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 9px 12px;
+  border-radius: 14px;
   cursor: pointer;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
   margin-bottom: 8px;
+  transition: background-color 0.15s ease;
 }
 
 .file-list li.active,
 .file-list li:hover,
 .search-results li:hover {
-  background: rgba(59, 130, 246, 0.16);
+  background: rgba(124, 58, 237, 0.16);
 }
 
 .sidebar-actions,
@@ -150,19 +155,19 @@ button.secondary {
 input,
 textarea {
   width: 100%;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: var(--panel);
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.92);
   color: var(--text);
   padding: 12px 14px;
 }
 
 input {
-  min-height: 44px;
+  min-height: 42px;
 }
 
 textarea {
-  min-height: 320px;
+  min-height: 180px;
   resize: vertical;
   font-family: Consolas, Monaco, 'Courier New', monospace;
   font-size: 0.95rem;
@@ -171,7 +176,7 @@ textarea {
 
 .editor-area {
   display: grid;
-  gap: 16px;
+  gap: 14px;
 }
 
 .editor-header {
@@ -183,7 +188,7 @@ textarea {
 
 .tab-bar {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -194,34 +199,39 @@ textarea {
   cursor: pointer;
   border: 1px solid transparent;
   color: var(--text);
+  font-size: 0.92rem;
 }
 
 .tab.active {
-  background: var(--accent);
-  border-color: rgba(59, 130, 246, 0.5);
+  background: rgba(124, 58, 237, 0.92);
+  border-color: rgba(124, 58, 237, 0.5);
 }
 
 .CodeMirror {
   height: auto;
-  min-height: 420px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: #0f172a;
+  min-height: 320px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: #0b1220;
+}
+
+.CodeMirror-scroll {
+  max-height: 550px;
 }
 
 .status {
   color: var(--muted);
   margin-left: 14px;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
 .output-panel,
 .panel-output {
-  background: var(--panel-3);
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 18px;
   padding: 14px;
-  min-height: 160px;
+  min-height: 140px;
   overflow: auto;
   font-family: Consolas, Monaco, 'Courier New', monospace;
   color: #e2e8f0;
@@ -247,9 +257,24 @@ pre {
   }
 }
 
+@media (max-width: 900px) {
+  .sidebar,
+  .right-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 720px) {
   .hero {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  button {
+    width: 100%;
   }
 }
