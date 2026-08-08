@@ -35,3 +35,8 @@ On Windows, you can also double-click the launcher:
 - run-ide.bat: Windows launcher
 - requirements.txt: base UI/runtime dependencies
 - requirements-ai.txt: optional AI backend dependency
+
+## Browser version
+
+A browser-based demo is available in the docs folder and can be published through GitHub Pages.
+Open the GitHub Pages site after enabling Pages for the repository.
