@@ -181,6 +181,34 @@ textarea {
   gap: 12px;
 }
 
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  border: 1px solid transparent;
+  color: var(--text);
+}
+
+.tab.active {
+  background: var(--accent);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.CodeMirror {
+  height: auto;
+  min-height: 420px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #0f172a;
+}
+
 .status {
   color: var(--muted);
   margin-left: 14px;

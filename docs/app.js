@@ -1,5 +1,5 @@
 ﻿const fileList = document.getElementById('fileList');
-const codeEditor = document.getElementById('codeEditor');
+const codeTextarea = document.getElementById('codeEditor');
 const output = document.getElementById('output');
 const packageOutput = document.getElementById('packageOutput');
 const envOutput = document.getElementById('envOutput');
@@ -7,6 +7,13 @@ const csvPreview = document.getElementById('csvPreview');
 const runtimeStatus = document.getElementById('runtimeStatus');
 const outputStatus = document.getElementById('outputStatus');
 const currentFileLabel = document.getElementById('currentFileLabel');
+const tabBar = document.getElementById('tabBar');
+const aiKeyInput = document.getElementById('aiKeyInput');
+const saveAiKeyButton = document.getElementById('saveAiKeyButton');
+const aiPrompt = document.getElementById('aiPrompt');
+const askAiButton = document.getElementById('askAiButton');
+const aiResponse = document.getElementById('aiResponse');
+const applyAiButton = document.getElementById('applyAiButton');
 
 const runButton = document.getElementById('runButton');
 const saveButton = document.getElementById('saveButton');
@@ -29,6 +36,7 @@ const terminalRunButton = document.getElementById('terminalRunButton');
 const terminalOutput = document.getElementById('terminalOutput');
 
 let pyodide = null;
+let editor = null;
 let workspaceFiles = {};
 let currentFile = 'main.py';
 const defaultExample = `print("Hello from the browser-based Python IDE")\nfor i in range(3):\n    print(i)\n`;
@@ -47,6 +55,76 @@ function updateStatus(text) {
 
 function updateOutputStatus(text) {
   outputStatus.textContent = text;
+}
+
+function getAiApiKey() {
+  return localStorage.getItem('python-ide-openai-key') || '';
+}
+
+function saveAiKey() {
+  const key = aiKeyInput.value.trim();
+  localStorage.setItem('python-ide-openai-key', key);
+  aiResponse.textContent = key ? 'OpenAI key saved locally.' : 'Removed saved OpenAI key.';
+}
+
+async function askAi() {
+  const key = getAiApiKey();
+  const prompt = aiPrompt.value.trim();
+  if (!key) {
+    aiResponse.textContent = 'Please enter an OpenAI API key to use the AI assistant.';
+    return;
+  }
+  if (!prompt) {
+    aiResponse.textContent = 'Enter a prompt for the AI assistant.';
+    return;
+  }
+
+  aiResponse.textContent = 'Asking AI...';
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are a helpful programming assistant.' },
+          { role: 'user', content: prompt },
+        ],
+        max_tokens: 600,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      aiResponse.textContent = `AI request failed: ${response.status} ${errorText}`;
+      return;
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content?.trim() || 'No response from AI.';
+    aiResponse.textContent = text;
+  } catch (error) {
+    aiResponse.textContent = `AI request error: ${error}`;
+  }
+}
+
+function applyAiSuggestion() {
+  const suggestion = aiResponse.textContent.trim();
+  if (!suggestion) {
+    return;
+  }
+
+  const doc = editor.getDoc();
+  const selection = doc.getSelection();
+  if (selection) {
+    doc.replaceSelection(suggestion);
+  } else {
+    const cursor = doc.getCursor();
+    doc.replaceRange(`\n# AI suggestion:\n${suggestion}\n`, cursor);
+  }
 }
 
 function saveWorkspace() {
@@ -78,6 +156,7 @@ function loadWorkspace() {
   }
 
   renderFileList();
+  renderTabBar();
   openFile(currentFile);
 }
 
@@ -92,19 +171,31 @@ function renderFileList() {
   });
 }
 
+function renderTabBar() {
+  tabBar.innerHTML = '';
+  Object.keys(workspaceFiles).forEach((filename) => {
+    const tab = document.createElement('div');
+    tab.textContent = filename;
+    tab.className = `tab${filename === currentFile ? ' active' : ''}`;
+    tab.addEventListener('click', () => openFile(filename));
+    tabBar.appendChild(tab);
+  });
+}
+
 function openFile(filename) {
   if (!workspaceFiles[filename]) {
     workspaceFiles[filename] = '';
   }
   currentFile = filename;
   currentFileLabel.textContent = filename;
-  codeEditor.value = workspaceFiles[filename];
+  editor.setValue(workspaceFiles[filename]);
   renderFileList();
+  renderTabBar();
   saveWorkspace();
 }
 
 function saveFile() {
-  workspaceFiles[currentFile] = codeEditor.value;
+  workspaceFiles[currentFile] = editor.getValue();
   saveWorkspace();
   updateOutputStatus('File saved');
 }
@@ -121,17 +212,32 @@ function createNewFile() {
   workspaceFiles[name] = '# New file\n';
   currentFile = name;
   renderFileList();
+  renderTabBar();
   openFile(name);
 }
 
 function downloadFile() {
-  const blob = new Blob([codeEditor.value], { type: 'text/plain;charset=utf-8' });
+  const blob = new Blob([editor.getValue()], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.download = currentFile;
   anchor.click();
   URL.revokeObjectURL(url);
+}
+
+function initEditor() {
+  editor = CodeMirror.fromTextArea(codeTextarea, {
+    mode: 'python',
+    lineNumbers: true,
+    indentUnit: 4,
+    theme: 'default',
+    autofocus: true,
+    viewportMargin: Infinity,
+  });
+  editor.on('change', () => {
+    workspaceFiles[currentFile] = editor.getValue();
+  });
 }
 
 async function initPyodide() {
@@ -190,7 +296,7 @@ async function refreshEnvironment() {
   }
 
   try {
-    const installed = await pyodide.runPythonAsync(`import sys, pkgutil\npackages = sorted([p.name for p in pkgutil.iter_modules()])\n'\n'.join(packages[:80])`);
+    const installed = await pyodide.runPythonAsync(`import pkgutil\npackages = sorted([p.name for p in pkgutil.iter_modules()])\n'\n'.join(packages[:80])`);
     envOutput.textContent = `Available Python modules:\n${installed}`;
   } catch (error) {
     envOutput.textContent = `Unable to refresh environment: ${error}`;
@@ -224,8 +330,8 @@ function handleSearch() {
         resultItem.addEventListener('click', () => {
           openFile(name);
           const position = content.split('\n').slice(0, index).join('\n').length;
-          codeEditor.focus();
-          codeEditor.setSelectionRange(position, position + line.length);
+          editor.focus();
+          editor.setSelection({ line: index, ch: 0 }, { line: index, ch: line.length });
         });
         searchResults.appendChild(resultItem);
       }
@@ -243,6 +349,7 @@ function loadLocalFiles(files) {
     reader.onload = () => {
       workspaceFiles[file.name] = reader.result;
       renderFileList();
+      renderTabBar();
       saveWorkspace();
     };
     reader.readAsText(file);
@@ -306,8 +413,13 @@ searchButton.addEventListener('click', handleSearch);
 loadCsvButton.addEventListener('click', loadCsvFile);
 csvLoader.addEventListener('change', handleCsvChange);
 terminalRunButton.addEventListener('click', runTerminalCommand);
+saveAiKeyButton.addEventListener('click', saveAiKey);
+askAiButton.addEventListener('click', askAi);
+applyAiButton.addEventListener('click', applyAiSuggestion);
 
 window.addEventListener('DOMContentLoaded', async () => {
+  initEditor();
   loadWorkspace();
+  aiKeyInput.value = getAiApiKey();
   await initPyodide();
 });
